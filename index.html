@@ -2,44 +2,74 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>شاشة مستقبل الأوامر</title>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شاشة استقبال الأوامر - TV Receiver</title>
     <style>
-        body { font-family: sans-serif; background: #121212; color: #fff; text-align: center; padding: 100px; }
-        h1 { font-size: 35px; color: #4CAF50; }
-        #last-cmd { color: #ffeb3b; font-size: 28px; margin-top: 20px; }
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 15vh;
+            margin: 0;
+        }
+        h1 {
+            font-size: 2.5rem;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.5rem;
+            color: #b0b0b0;
+        }
+        .status-box {
+            background: #1e1e1e;
+            display: inline-block;
+            padding: 30px 50px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: 2px solid #333;
+        }
     </style>
 </head>
 <body>
-    <h1>📺 شاشة سامسونج متصلة بـ Firebase</h1>
-    <p>في انتظار الأوامر من تطبيق الهاتف...</p>
-    <div id="last-cmd">آخر أمر: لا توجد أوامر بعد</div>
 
-    <script>
-        // إعدادات Firebase الخاصة بالمشروع ديالي
+    <div class="status-box">
+        <h1>🟢 شاشة سامسونج متصلة</h1>
+        <p id="command-display">في انتظار الأوامر من تطبيق الهاتف...</p>
+    </div>
+
+    <!-- استيراد مكتبات Firebase وربطها بالمفاتيح الحقيقية -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // إعدادات Firebase الخاصة بك
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+          apiKey: "AIzaSyDqaxEVofAo4hpusSoEs_I7WjDBYhTsmmE",
+          authDomain: "tvremotecontrol-79e6d.firebaseapp.com",
+          databaseURL: "https://tvremotecontrol-79e6d-default-rtdb.firebaseio.com",
+          projectId: "tvremotecontrol-79e6d",
+          storageBucket: "tvremotecontrol-79e6d.firebasestorage.app",
+          messagingSenderId: "290790846314",
+          appId: "1:290790846314:web:b8567e16119030a0c27f13",
+          measurementId: "G-54NFVM8CXV"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        // تهيئة Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-        // الاستماع فقط للأوامر دون أي توجيه لليوتيوب
-        db.ref('tv_commands/latest_command').on('value', (snapshot) => {
-            const command = snapshot.val();
-            if (command) {
-                document.getElementById('last-cmd').innerText = "آخر أمر: " + command;
+        // مراقبة الأوامر القادمة بصفة ثابتة بدون أي توجيه تلقائي لليوتيوب
+        const commandRef = ref(db, 'tv_command');
+        onValue(commandRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                console.log("تم استلام أمر:", data);
+                document.getElementById('command-display').innerText = "آخر أمر تم استقباله: " + (data.action || data);
             }
         });
     </script>
+
 </body>
 </html>
-  
-
