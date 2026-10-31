@@ -2,32 +2,22 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جهاز التحكم عن بعد - TV Remote</title>
-    <!-- استدعاء مكتبة Firebase Realtime Database -->
+    <title>شاشة مستقبل الأوامر</title>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        body { font-family: sans-serif; background: #121212; color: #fff; text-align: center; padding: 50px; }
-        .btn { padding: 15px 30px; font-size: 18px; margin: 10px; cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 8px; }
-        .btn:active { background: #45a049; }
+        body { font-family: sans-serif; background: #121212; color: #fff; text-align: center; padding: 100px; }
+        h1 { font-size: 35px; color: #4CAF50; }
+        #last-cmd { color: #ffeb3b; font-size: 28px; margin-top: 20px; }
     </style>
 </head>
 <body>
-
-    <h1>🎮 وحدة التحكم عن بعد</h1>
-    <p id="status">اختر أمراً لإرساله إلى التلفاز:</p>
-
-    <div>
-        <button class="btn" onclick="sendCommand('netflix')">تشغيل Netflix</button>
-        <button class="btn" onclick="sendCommand('youtube')">تشغيل YouTube</button>
-        <button class="btn" style="background: #f44336;" onclick="sendCommand('off')">إطفاء الشاشة</button>
-    </div>
-
-    <h3 id="feedback" style="margin-top: 30px; color: #ffeb3b;"></h3>
+    <h1>📺 شاشة سامسونج متصلة بـ Firebase</h1>
+    <p>في انتظار الأوامر من تطبيق الهاتف...</p>
+    <div id="last-cmd">آخر أمر: لا توجد أوامر بعد</div>
 
     <script>
-        // 1. معلومات الربط الخاصة بـ Firebase (عوضهم بالمعلومات الحقيقية ديال مشروعك)
+        // إعدادات Firebase الخاصة بالمشروع ديالي
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_AUTH_DOMAIN",
@@ -38,20 +28,18 @@
             appId: "YOUR_APP_ID"
         };
 
-        // تهيئة Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 2. دالة إرسال الأمر إلى Firebase بدون أي أخطاء
-        function sendCommand(cmd) {
-            db.ref('tv_commands/latest_command').set(cmd)
-                .then(() => {
-                    document.getElementById('feedback').innerText = "تم إرسال الأمر بنجاح: " + cmd;
-                })
-                .catch((error) => {
-                    document.getElementById('feedback').innerText = "خطأ في الإرسال: " + error.message;
-                });
-        }
+        // الاستماع فقط للأوامر دون أي توجيه لليوتيوب
+        db.ref('tv_commands/latest_command').on('value', (snapshot) => {
+            const command = snapshot.val();
+            if (command) {
+                document.getElementById('last-cmd').innerText = "آخر أمر: " + command;
+            }
+        });
     </script>
 </body>
 </html>
+  
+
